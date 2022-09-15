@@ -1,57 +1,71 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getUsers, selectData, sortList } from "./features/data/dataSlice";
+import Container from "react-bootstrap/Container";
+import Navbar from "react-bootstrap/Navbar";
+import Table from "react-bootstrap/Table";
+import Chart from "./Components/Chart";
 
 function App() {
+  const dispatch = useDispatch();
+  const userData = useSelector(selectData);
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    dispatch(getUsers());
+  }, [dispatch]);
+  useEffect(() => {
+    setData([...userData]);
+  }, [userData]);
+  const handleClick = () => {
+    let temp = [...userData].sort((a, b) =>
+      a.first_name > b.first_name ? 1 : -1
+    );
+    dispatch(sortList(temp));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <>
+      <Navbar bg="light">
+        <Container>
+          <Navbar.Brand href="#home">
+            Burgwalden Internship Assignment
+          </Navbar.Brand>
+        </Container>
+      </Navbar>
+      <h2 className="text-center mt-3">
+        Fetching the User Data and Displaying it.
+      </h2>
+      <Container className="mt-5">
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th onClick={handleClick} style={{ cursor: "pointer" }}>
+                First Name
+              </th>
+              <th>Last Name</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((user, index) => {
+              const { first_name, last_name, email } = user;
+              return (
+                <tr key={index}>
+                  <td>{first_name}</td>
+                  <td>{last_name}</td>
+                  <td>{email}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+      </Container>
+      <h2 className="text-center mt-3">Replicate the line chart in react</h2>
+      <h3 className="mx-5"></h3>
+      <Container className="my-5">
+        <Chart />
+      </Container>
+    </>
   );
 }
 
